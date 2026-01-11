@@ -8,6 +8,8 @@
 
 Web Dashboard untuk Pelaris.id - Omnichannel POS System.
 
+**Repository:** [https://github.com/rejaldev/Pelaris.id](https://github.com/rejaldev/Pelaris.id)
+
 ## Features
 
 - Point of Sale dengan smart search
