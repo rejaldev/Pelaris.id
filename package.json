@@ -1,0 +1,47 @@
+{
+    "name": "Pelaris.id-frontend",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev --turbopack -H 0.0.0.0 -p 3100",
+        "build": "next build",
+        "start": "next start -H 0.0.0.0 -p 3100",
+        "lint": "eslint",
+        "test": "vitest",
+        "test:ui": "vitest --ui",
+        "test:coverage": "vitest run --coverage"
+    },
+    "dependencies": {
+        "@hookform/resolvers": "^5.2.2",
+        "@radix-ui/react-alert-dialog": "^1.1.15",
+        "@radix-ui/react-toast": "^1.2.15",
+        "@sentry/nextjs": "^10.32.1",
+        "axios": "^1.13.2",
+        "clsx": "^2.1.1",
+        "lucide-react": "^0.555.0",
+        "next": "^16.1.1",
+        "react": "^19.2.3",
+        "react-dom": "^19.2.3",
+        "react-hook-form": "^7.70.0",
+        "recharts": "^3.5.0",
+        "socket.io-client": "^4.7.2",
+        "tailwind-merge": "^3.4.0",
+        "zod": "^4.3.5",
+        "zustand": "^5.0.9"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.1",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@vitejs/plugin-react": "^5.1.2",
+        "eslint": "^9",
+        "eslint-config-next": "^16.1.1",
+        "jsdom": "^27.4.0",
+        "tailwindcss": "^4",
+        "typescript": "^5",
+        "vitest": "^4.0.16"
+    }
+}
