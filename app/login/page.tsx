@@ -29,13 +29,16 @@ export default function LoginPage() {
 
       try {
         const response = await authAPI.login(data.email, data.password);
-        const { token, user } = response.data;
+        const { token, user, csrfToken } = response.data;
         
         // Clear old auth first
         clearAuth();
         
         // Save to localStorage
         setAuth(token, user);
+        if (csrfToken) {
+          localStorage.setItem('csrfToken', csrfToken);
+        }
         
         // KASIR hanya bisa akses POS, role lain ke dashboard
         if (user.role === 'KASIR') {

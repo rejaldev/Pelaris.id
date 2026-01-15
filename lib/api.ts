@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
-  (process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:5100/api' 
-    : 'https://api-pelaris.ziqrishahab.com/api');
+const API_BASE_URL = (() => {
+  // Explicit env always wins
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+
+  // Safe default for local dev
+  if (process.env.NODE_ENV === 'development') return 'http://localhost:5100/api';
+
+  // In non-dev, missing env is a misconfig -> fail fast
+  throw new Error('NEXT_PUBLIC_API_URL is not set');
+})();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -12,12 +18,21 @@ const api = axios.create({
   },
 });
 
-// Add token to every request if available
+// Add token and CSRF header to every request if available
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    const method = (config.method || 'get').toUpperCase();
+    const isSafeMethod = method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
+    if (!isSafeMethod) {
+      const csrfToken = localStorage.getItem('csrfToken');
+      if (csrfToken) {
+        config.headers['x-csrf-token'] = csrfToken;
+      }
     }
   }
   return config;
@@ -311,13 +326,21 @@ export const returnsAPI = {
     transactionId: string;
     cabangId: string;
     reason: string;
+    reasonDetail?: string;
     notes?: string;
+    conditionNote?: string;
+    photoUrls?: string[];
+    managerOverride?: boolean;
     items: Array<{
       productVariantId: string;
       quantity: number;
       price: number;
     }>;
     refundMethod?: string;
+    exchangeItems?: Array<{
+      productVariantId: string;
+      quantity: number;
+    }>;
   }) => api.post('/returns', data),
   
   approveReturn: (id: string, data: { approvedBy: string; notes?: string }) =>
@@ -465,3 +488,12 @@ export const backupAPI = {
   // Reset settings
   resetSettings: () => api.post('/backup/reset-settings'),
 };
+
+// Tenant API
+export const tenantsAPI = {
+  getCurrent: () => api.get('/tenants/current'),
+  update: (data: any) => api.patch('/tenants/current', data),
+};
+
+// Export API_BASE_URL for direct usage
+export { API_BASE_URL };

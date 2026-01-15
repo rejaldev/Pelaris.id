@@ -36,6 +36,7 @@ export const getAuth = (): { token: string | null; user: User | null } => {
 export const clearAuth = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  localStorage.removeItem('csrfToken');
   
   // Clear cookie
   document.cookie = 'user=; path=/; max-age=0';
