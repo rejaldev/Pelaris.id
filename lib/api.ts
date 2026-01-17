@@ -23,8 +23,8 @@ const API_BASE_URL = (() => {
   // Safe default for local dev
   if (process.env.NODE_ENV === 'development') return 'http://localhost:5100/api';
 
-  // In non-dev, missing env is a misconfig -> fail fast
-  throw new Error('NEXT_PUBLIC_API_URL is not set');
+  // Production fallback (set NEXT_PUBLIC_API_URL in Vercel for production)
+  return 'https://api-pelaris.ziqrishahab.com/api';
 })();
 
 const api = axios.create({
