@@ -8,6 +8,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/components/ui/Toast';
 import { useCartStore, useCheckoutStore, useProductStore } from '@/stores';
 import { useProductSocket } from '@/hooks/useProductSocket';
+import { logger } from '@/lib/logger';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -394,7 +395,8 @@ export default function POSPage() {
           });
         }
       } catch (e) {
-        console.error('Failed to load printer settings:', e);
+        // Silent fail - printer settings are optional
+        logger.error('Failed to load printer settings:', e);
       }
     };
     
@@ -406,7 +408,7 @@ export default function POSPage() {
           await connectQZ();
         }
       } catch (e) {
-        console.error('QZ Tray not available:', e);
+        logger.debug('QZ Tray not available:', e);
         setQzConnected(false);
       }
     };
@@ -698,7 +700,7 @@ export default function POSPage() {
         setTimeout(() => handlePrintReceipt(res.data.transaction, paymentMethod === 'CASH' ? cashReceived : 0), 500);
       }
     } catch (e: any) {
-      console.error(e);
+      logger.error('Transaction failed:', e);
       toast.error(e.response?.data?.error || 'Transaksi gagal!');
     } finally {
       setProcessing(false);
@@ -755,7 +757,7 @@ export default function POSPage() {
       await printReceipt(printOptions);
       toast.success('Struk berhasil dicetak!');
     } catch (e: any) {
-      console.error('Print error:', e);
+      logger.error('Print error:', e);
       toast.error(`Gagal mencetak: ${e.message || 'Unknown error'}`);
     } finally {
       setPrinting(false);

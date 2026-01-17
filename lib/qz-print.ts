@@ -9,6 +9,8 @@ declare global {
   }
 }
 
+import { logger } from './logger';
+
 // QZ Tray connection state
 let qzConnection: Promise<void> | null = null;
 let isConnected = false;
@@ -182,7 +184,7 @@ export async function connectQZ(): Promise<void> {
       });
       
       window.qz.websocket.setErrorCallbacks((error: any) => {
-        console.error('QZ Tray error:', error);
+        logger.error('QZ Tray error:', error);
       });
       
       await window.qz.websocket.connect();

@@ -34,11 +34,8 @@ export default function LoginPage() {
         // Clear old auth first
         clearAuth();
         
-        // Save to localStorage
-        setAuth(token, user);
-        if (csrfToken) {
-          localStorage.setItem('csrfToken', csrfToken);
-        }
+        // Save to sessionStorage (CSRF token will be stored in memory via setAuth)
+        setAuth(token, user, csrfToken);
         
         // KASIR hanya bisa akses POS, role lain ke dashboard
         if (user.role === 'KASIR') {

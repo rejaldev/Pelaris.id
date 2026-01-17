@@ -18,6 +18,7 @@ type EventCallback = (data: any) => void;
 const eventListeners: Map<string, Set<EventCallback>> = new Map();
 
 import { getToken } from './auth';
+import { logger } from './logger';
 
 /**
  * Get authentication token
@@ -38,7 +39,7 @@ async function loadSocketIO() {
     io = socketModule.io;
     return io;
   } catch (error) {
-    console.error('[Socket] Failed to load socket.io-client:', error);
+    logger.error('[Socket] Failed to load socket.io-client:', error);
     return null;
   }
 }
@@ -49,20 +50,20 @@ async function loadSocketIO() {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function initSocket(): Promise<any> {
   if (socket?.connected) {
-    console.log('[Socket] Already connected');
+    logger.debug('[Socket] Already connected');
     return socket;
   }
 
   // Get auth token - required for connection
   const token = getAuthToken();
   if (!token) {
-    console.warn('[Socket] No auth token available, skipping socket connection');
+    logger.warn('[Socket] No auth token available, skipping socket connection');
     return null;
   }
 
   const socketIO = await loadSocketIO();
   if (!socketIO) {
-    console.warn('[Socket] socket.io-client not available');
+    logger.warn('[Socket] socket.io-client not available');
     return null;
   }
 
@@ -83,12 +84,12 @@ export async function initSocket(): Promise<any> {
     });
 
     socket.on('connect', () => {
-      console.log('[Socket] Connected to server (authenticated)');
+      logger.info('[Socket] Connected to server (authenticated)');
       reconnectAttempts = 0;
     });
 
     socket.on('disconnect', (reason: string) => {
-      console.log('[Socket] Disconnected:', reason);
+      logger.info('[Socket] Disconnected:', reason);
     });
 
     socket.on('connect_error', (error: Error) => {
@@ -96,16 +97,16 @@ export async function initSocket(): Promise<any> {
       
       // Check if authentication error
       if (error.message === 'Authentication required' || error.message === 'Invalid or expired token') {
-        console.error('[Socket] Authentication failed:', error.message);
+        logger.error('[Socket] Authentication failed:', error.message);
         // Don't retry on auth errors - user needs to re-login
         disconnectSocket();
         return;
       }
       
-      console.warn(`[Socket] Connection error (attempt ${reconnectAttempts}):`, error.message);
+      logger.warn(`[Socket] Connection error (attempt ${reconnectAttempts}):`, error.message);
       
       if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-        console.error('[Socket] Max reconnection attempts reached');
+        logger.error('[Socket] Max reconnection attempts reached');
       }
     });
 
@@ -114,7 +115,7 @@ export async function initSocket(): Promise<any> {
 
     return socket;
   } catch (error) {
-    console.error('[Socket] Failed to initialize:', error);
+    logger.error('[Socket] Failed to initialize:', error);
     return null;
   }
 }
@@ -136,7 +137,7 @@ function setupEventForwarding(sock: any) {
   events.forEach(event => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sock.on(event, (data: any) => {
-      console.log(`[Socket] Received ${event}:`, data);
+      logger.debug(`[Socket] Received ${event}:`, data);
       
       // Forward to all registered listeners
       const listeners = eventListeners.get(event);
@@ -145,7 +146,7 @@ function setupEventForwarding(sock: any) {
           try {
             callback(data);
           } catch (err) {
-            console.error(`[Socket] Error in ${event} listener:`, err);
+            logger.error(`[Socket] Error in ${event} listener:`, err);
           }
         });
       }
@@ -187,7 +188,7 @@ export function disconnectSocket(): void {
     socket.disconnect();
     socket = null;
     eventListeners.clear();
-    console.log('[Socket] Disconnected and cleaned up');
+    logger.info('[Socket] Disconnected and cleaned up');
   }
 }
 
