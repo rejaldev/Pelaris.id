@@ -58,9 +58,12 @@ export const useTransactionsStore = create<TransactionsState>((set) => ({
   fetchChannels: async () => {
     try {
       const res = await channelsAPI.getChannels();
-      set({ channels: res.data });
+      // Handle both direct array and paginated response
+      const channelsData = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+      set({ channels: channelsData });
     } catch (error) {
       console.error('Error fetching channels:', error);
+      set({ channels: [] });
     }
   },
   
@@ -76,9 +79,12 @@ export const useTransactionsStore = create<TransactionsState>((set) => ({
         status: selectedStatus || undefined,
         search: search || undefined,
       });
-      set({ transactions: res.data });
+      // Handle paginated response format from backend
+      const transactionsData = res.data?.data || res.data || [];
+      set({ transactions: Array.isArray(transactionsData) ? transactionsData : [] });
     } catch (error) {
       console.error('Error fetching transactions:', error);
+      set({ transactions: [] });
     } finally {
       set({ loading: false });
     }
