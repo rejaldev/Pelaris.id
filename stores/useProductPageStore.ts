@@ -385,16 +385,21 @@ export const useProductPageStore = create<ProductPageState>()((set, get) => ({
         cabangAPI.getCabangs(),
       ]);
       
+      // Backend returns { data: [...], pagination: {...} } for products
+      const productsData = productsRes.data?.data || productsRes.data || [];
+      const categoriesData = Array.isArray(categoriesRes.data) ? categoriesRes.data : [];
+      const cabangsData = Array.isArray(cabangsRes.data) ? cabangsRes.data : [];
+      
       set({
-        products: productsRes.data,
-        categories: categoriesRes.data,
-        cabangs: cabangsRes.data.filter((c: Cabang) => c.isActive),
+        products: Array.isArray(productsData) ? productsData : [],
+        categories: categoriesData,
+        cabangs: cabangsData.filter((c: Cabang) => c.isActive),
         selectedProducts: [],
         loading: false,
       });
     } catch (error) {
       console.error('Error fetching data:', error);
-      set({ loading: false });
+      set({ products: [], categories: [], cabangs: [], loading: false });
     }
   },
   
@@ -411,10 +416,15 @@ export const useProductPageStore = create<ProductPageState>()((set, get) => ({
         cabangAPI.getCabangs(),
       ]);
       
+      // Backend returns { data: [...], pagination: {...} } for products
+      const productsData = productsRes.data?.data || productsRes.data || [];
+      const categoriesData = Array.isArray(categoriesRes.data) ? categoriesRes.data : [];
+      const cabangsData = Array.isArray(cabangsRes.data) ? cabangsRes.data : [];
+      
       set({
-        products: productsRes.data,
-        categories: categoriesRes.data,
-        cabangs: cabangsRes.data.filter((c: Cabang) => c.isActive),
+        products: Array.isArray(productsData) ? productsData : [],
+        categories: categoriesData,
+        cabangs: cabangsData.filter((c: Cabang) => c.isActive),
       });
     } catch (error) {
       console.error('Error fetching data:', error);
